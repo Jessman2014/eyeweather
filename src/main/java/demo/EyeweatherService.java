@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -16,7 +15,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,11 +31,11 @@ public class EyeweatherService {
 		URI googleUri = new URIBuilder()
 		.setScheme("http")
 		.setHost(GOOGLE_HOST)
-		//.setPath("/maps/api/geocode/json")
 		.setParameter("latlng", latitude.toString() + "," + longitude.toString())
 		.setParameter("sensor", "false")
 		.build();
 		//?latlng=43.81,-91.23&sensor=false
+		
 		URI weatherUri = new URIBuilder()
 		.setScheme("http")
 		.setHost(WEATHER_HOST)
@@ -46,6 +44,7 @@ public class EyeweatherService {
 		.setParameter("FcstType", "json")
 		.build();
 			//?lat=43.81&lon=-92.23&FcstType=json
+		
 		HttpGet httpget = new HttpGet(googleUri);		
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		RequestConfig requestConfig = RequestConfig.custom()
@@ -59,7 +58,24 @@ public class EyeweatherService {
 		HttpEntity result = response1.getEntity();
 		InputStream stream = result.getContent();			
 		ObjectMapper mapper = new ObjectMapper();
-		Latlon latlon = mapper.readValue(stream, new TypeReference<Latlon>(){});		
+		Address addr = mapper.readValue(stream, new TypeReference<Address>(){});		
+		stream.close();
+		httpclient.close();
+		
+		httpget = new HttpGet(weatherUri);		
+		httpclient = HttpClients.createDefault();
+		requestConfig = RequestConfig.custom()
+		        .setSocketTimeout(1000)
+		        .setConnectTimeout(1000)
+		        .build();
+		
+		httpget.setConfig(requestConfig);		
+		response1 = httpclient.execute(httpget);		
+		
+		result = response1.getEntity();
+		stream = result.getContent();			
+		mapper = new ObjectMapper();
+		Weather weather = mapper.readValue(stream, new TypeReference<Weather>(){});		
 		stream.close();
 		httpclient.close();
 		
