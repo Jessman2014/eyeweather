@@ -28,6 +28,7 @@ public class EyeweatherService {
 	public static final String WEATHER_HOST = "forecast.weather.gov/MapClick.php";
 	
 	public void createLatlon(String userId, Integer latitude, Integer longitude) throws URISyntaxException, ClientProtocolException, IOException {
+		
 		URI googleUri = new URIBuilder()
 		.setScheme("http")
 		.setHost(GOOGLE_HOST)
@@ -86,6 +87,9 @@ public class EyeweatherService {
 			}
 			
 		});*/
-		eyeweatherRepository.addLatlon(latlon);
+		
+		Latlon newLatlon = new Latlon.Builder().userId(userId).latitude(latitude)
+				.longitude(longitude).address(addr).weather(weather).build();
+		eyeweatherRepository.addLatlon(newLatlon);
 	}
 }
