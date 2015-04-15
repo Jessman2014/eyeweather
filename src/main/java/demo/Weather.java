@@ -1,10 +1,8 @@
 package demo;
 
 import java.util.Date;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Weather {
@@ -13,8 +11,7 @@ public class Weather {
 	private int temp;
 	private int relh;
 	private String weather;
-	@JsonProperty("text")
-	private List<String> forecast;
+	private String forecast;
 	private Date date;
 	
 	public String getId() {
@@ -47,11 +44,11 @@ public class Weather {
 	public void setWeather(String weather) {
 		this.weather = weather;
 	}
-	public void setForecast(List<String> forecast) {
-		this.forecast = forecast;
-	}
-	public List<String> getForecast() {
+	public String getForecast() {
 		return forecast;
+	}
+	public void setForecast(String forecast) {
+		this.forecast = forecast;
 	}
 	public Date getDate() {
 		return date;

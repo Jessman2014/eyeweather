@@ -5,9 +5,12 @@ public class Latlon {
 	private String userId;
 	private double latitude;
 	private double longitude;
-	private Weather weather;
-	private Address address;
-	
+	private String address;
+	private int winds;
+	private int temp;
+	private int relh;
+	private String weather;
+	private String forecast;
 	
 	public String getId() {
 		return id;
@@ -33,62 +36,41 @@ public class Latlon {
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
-	public Weather getWeather() {
-		return weather;
-	}
-	public void setWeather(Weather weather) {
-		this.weather = weather;
-	}
-	public Address getAddress() {
+	public String getAddress() {
 		return address;
 	}
-	public void setAddress(Address address) {
+	public void setAddress(String address) {
 		this.address = address;
 	}
-	private Latlon(Builder b) {
-		id = b.id;
-		userId = b.userId;
-		latitude = b.latitude;
-		longitude = b.longitude;
-		weather = b.weather;
-		address = b.address;
+	public int getWinds() {
+		return winds;
 	}
-	
-	public static class Builder {
-		private String id;
-		private String userId;
-		private double latitude;
-		private double longitude;
-		private Weather weather;
-		private Address address;
-		
-		public Builder id (String id) {
-			this.id = id;
-			return this;
-		}
-		public Builder userId (String userId) {
-			this.userId = userId;
-			return this;
-		}
-		public Builder latitude (double latitude) {
-			this.latitude = latitude;
-			return this;
-		}
-		public Builder longitude (double longitude) {
-			this.longitude = longitude;
-			return this;
-		}
-		public Builder weather (Weather weather){
-			this.weather = weather;
-			return this;
-		}
-		public Builder address (Address address){
-			this.address = address;
-			return this;
-		}
-		public Latlon build() {
-			return new Latlon(this);
-		}
+	public void setWinds(int winds) {
+		this.winds = winds;
+	}
+	public int getTemp() {
+		return temp;
+	}
+	public void setTemp(int temp) {
+		this.temp = temp;
+	}
+	public int getRelh() {
+		return relh;
+	}
+	public void setRelh(int relh) {
+		this.relh = relh;
+	}
+	public String getWeather() {
+		return weather;
+	}
+	public void setWeather(String weather) {
+		this.weather = weather;
+	}
+	public String getForecast() {
+		return forecast;
+	}
+	public void setForecast(String forecast) {
+		this.forecast = forecast;
 	}
 	
 }

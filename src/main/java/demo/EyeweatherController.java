@@ -44,8 +44,8 @@ public class EyeweatherController {
 		hits.setLatlons(latlons);
 		hits.setStatus(status);
 		hits.setTimestamp(new Date());
-		eyeweatherService.deleteLatlon(userid, "1");
-		eyeweatherService.deleteLatlon(userid, "2");
+		eyeweatherService.deleteLatlon(userid, "43.81");
+		eyeweatherService.deleteLatlon(userid, "39.9");
 		return hits;
 	}
 }

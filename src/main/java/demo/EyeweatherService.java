@@ -6,8 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -16,8 +14,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -29,6 +29,11 @@ public class EyeweatherService {
 	public static final String WEATHER_HOST = "forecast.weather.gov/MapClick.php";
 	
 	public void createLatlon(String userId, Double latitude, Double longitude) throws URISyntaxException, ClientProtocolException, IOException {
+		Latlon newLatlon = new Latlon();
+		newLatlon.setUserId(userId);
+		newLatlon.setId(latitude.toString());
+		newLatlon.setLatitude(latitude);
+		newLatlon.setLongitude(longitude);
 		
 		URI googleUri = new URIBuilder()
 		.setScheme("http")
@@ -36,7 +41,6 @@ public class EyeweatherService {
 		.setParameter("latlng", latitude.toString() + "," + longitude.toString())
 		.setParameter("sensor", "false")
 		.build();
-		//?latlng=43.81,-91.23&sensor=false
 		
 		URI weatherUri = new URIBuilder()
 		.setScheme("http")
@@ -45,46 +49,53 @@ public class EyeweatherService {
 		.setParameter("lon", longitude.toString())
 		.setParameter("FcstType", "json")
 		.build();
-			//?lat=43.81&lon=-92.23&FcstType=json
 		
-		Address addr = new Address();
-		addr.setId(latitude.toString());
-		Weather weather = new Weather();
-		weather.setWeatherId(latitude.toString());
-		
-		HttpGet httpget = new HttpGet(googleUri);		
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-		RequestConfig requestConfig = RequestConfig.custom()
+		HttpGet httpget1 = new HttpGet(googleUri);		
+		CloseableHttpClient httpclient1 = HttpClients.createDefault();
+		RequestConfig requestConfig1 = RequestConfig.custom()
 		        .setSocketTimeout(1000)
 		        .setConnectTimeout(1000)
 		        .build();
 		
-		httpget.setConfig(requestConfig);		
-		CloseableHttpResponse response1 = httpclient.execute(httpget);		
+		httpget1.setConfig(requestConfig1);		
+		CloseableHttpResponse response1 = httpclient1.execute(httpget1);		
 		
-		HttpEntity result = response1.getEntity();
-		InputStream stream = result.getContent();			
-		ObjectMapper mapper = new ObjectMapper();
-		Address addr = mapper.readValue(stream, new TypeReference<Address>(){});		
-		stream.close();
-		httpclient.close();
+		HttpEntity result1 = response1.getEntity();
+		InputStream stream1 = result1.getContent();			
+		ObjectMapper mapper1 = new ObjectMapper();
+		JsonNode root1 = mapper1.readTree(stream1);
+		JsonNode results = root1.get("results");
+		JsonNode frmt = results.get(0);
+		JsonNode frmtAddr = frmt.get("formatted_address");
+		String formattedAddress = frmtAddr.asText();
+		newLatlon.setAddress(formattedAddress);
+		stream1.close();
+		httpclient1.close();
 		
-		httpget = new HttpGet(weatherUri);		
-		httpclient = HttpClients.createDefault();
-		requestConfig = RequestConfig.custom()
+		HttpGet httpget2 = new HttpGet(weatherUri);		
+		CloseableHttpClient httpclient2 = HttpClients.createDefault();
+		RequestConfig requestConfig2 = RequestConfig.custom()
 		        .setSocketTimeout(1000)
 		        .setConnectTimeout(1000)
 		        .build();
 		
-		httpget.setConfig(requestConfig);		
-		response1 = httpclient.execute(httpget);		
+		httpget2.setConfig(requestConfig2);		
+		CloseableHttpResponse response2 = httpclient2.execute(httpget2);		
 		
-		result = response1.getEntity();
-		stream = result.getContent();			
-		mapper = new ObjectMapper();
-		Weather weather = mapper.readValue(stream, new TypeReference<Weather>(){});		
-		stream.close();
-		httpclient.close();
+		HttpEntity result2 = response2.getEntity();
+		InputStream stream2 = result2.getContent();			
+		ObjectMapper mapper2 = new ObjectMapper();
+		JsonNode root2 = mapper2.readTree(stream2);
+		root2 = mapper2.readTree(stream2);
+		JsonNode data = root2.get("data");
+		JsonNode curObs = root2.get("currentobservation");
+		newLatlon.setForecast(data.get("text").get(0).asText());
+		newLatlon.setRelh(curObs.get("Relh").asInt());
+		newLatlon.setTemp(curObs.get("Temp").asInt());
+		newLatlon.setWinds(curObs.get("Winds").asInt());
+		newLatlon.setWeather(curObs.get("Weather").asText());
+		stream2.close();
+		httpclient2.close();
 		
 		/*Collections.sort(repos, new Comparator<Repo>() {
 			@Override
@@ -94,8 +105,6 @@ public class EyeweatherService {
 			
 		});*/
 		
-		Latlon newLatlon = new Latlon.Builder().userId(userId).latitude(latitude)
-				.longitude(longitude).address(addr).weather(weather).build();
 		eyeweatherRepository.addLatlon(newLatlon);
 	}
 	
