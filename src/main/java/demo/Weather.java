@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Weather {
-	private int weatherId;
+	private String id;
 	private int winds;
 	private int temp;
 	private int relh;
@@ -17,11 +17,11 @@ public class Weather {
 	private List<String> forecast;
 	private Date date;
 	
-	public int getWeatherId() {
-		return weatherId;
+	public String getId() {
+		return id;
 	}
-	public void setWeatherId(int weatherId) {
-		this.weatherId = weatherId;
+	public void setId(String id) {
+		this.id = id;
 	}
 	public int getWinds() {
 		return winds;
@@ -49,6 +49,9 @@ public class Weather {
 	}
 	public void setForecast(List<String> forecast) {
 		this.forecast = forecast;
+	}
+	public List<String> getForecast() {
+		return forecast;
 	}
 	public Date getDate() {
 		return date;

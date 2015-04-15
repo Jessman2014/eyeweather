@@ -47,6 +47,11 @@ public class EyeweatherService {
 		.build();
 			//?lat=43.81&lon=-92.23&FcstType=json
 		
+		Address addr = new Address();
+		addr.setId(latitude.toString());
+		Weather weather = new Weather();
+		weather.setWeatherId(latitude.toString());
+		
 		HttpGet httpget = new HttpGet(googleUri);		
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		RequestConfig requestConfig = RequestConfig.custom()
