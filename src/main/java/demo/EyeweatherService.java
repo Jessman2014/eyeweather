@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,5 +92,9 @@ public class EyeweatherService {
 		Latlon newLatlon = new Latlon.Builder().userId(userId).latitude(latitude)
 				.longitude(longitude).address(addr).weather(weather).build();
 		eyeweatherRepository.addLatlon(newLatlon);
+	}
+	
+	public List<Latlon> getLatlons (String userId) {
+		return eyeweatherRepository.getLatlons(userId);
 	}
 }
