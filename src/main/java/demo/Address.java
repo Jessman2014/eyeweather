@@ -5,65 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Address {
-	private String addressId;
-	@JsonProperty("street_number")
-	private String streetNumber;
-	private String route;
-	private String locality;
-	@JsonProperty("administrative_area_level_2")
-	private String county;
-	@JsonProperty("administrative_area_level_1")
-	private String city;
-	@JsonProperty("postal_code")
-	private int zip;
-	private String country;
+	private String id;
+	@JsonProperty("formatted_address")
+	private String address;
 	
-	public String getAddressId() {
-		return addressId;
+	public String getId() {
+		return id;
 	}
-	public void setAddressId(String addressId) {
-		this.addressId = addressId;
+	public void setId(String id) {
+		this.id = id;
 	}
-	public String getStreetNumber() {
-		return streetNumber;
+	public String getAddress() {
+		return address;
 	}
-	public void setStreetNumber(String streetNumber) {
-		this.streetNumber = streetNumber;
-	}
-	public String getRoute() {
-		return route;
-	}
-	public void setRoute(String route) {
-		this.route = route;
-	}
-	public String getLocality() {
-		return locality;
-	}
-	public void setLocality(String locality) {
-		this.locality = locality;
-	}
-	public String getCounty() {
-		return county;
-	}
-	public void setCounty(String county) {
-		this.county = county;
-	}
-	public String getCity() {
-		return city;
-	}
-	public void setCity(String city) {
-		this.city = city;
-	}
-	public int getZip() {
-		return zip;
-	}
-	public void setZip(int zip) {
-		this.zip = zip;
-	}
-	public String getCountry() {
-		return country;
-	}
-	public void setCountry(String country) {
-		this.country = country;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }

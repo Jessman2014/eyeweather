@@ -21,6 +21,13 @@ public class EyeweatherRepository {
 		}
 		return returnLatlons;
 	}
+
+	public void delete(String userId, String latlonId) {
+		for (Latlon latlon : latlons) {
+			if(latlon.getUserId().equals(userId) && latlon.getId().equals(latlonId))
+				latlons.remove(latlon);
+		}
+	}
 	
 }
 

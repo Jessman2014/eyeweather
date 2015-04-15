@@ -1,5 +1,7 @@
 package demo;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
@@ -20,13 +22,21 @@ public class EyeweatherController {
 	
 	@RequestMapping(value = "/users/{userid}/locations", produces = MediaType.APPLICATION_JSON_VALUE, method=RequestMethod.GET)
 	@ResponseBody
-	public EyeweatherResponse get(@PathVariable String user) {
+	public EyeweatherResponse get(@PathVariable String userid) {
 		EyeweatherResponse hits = new EyeweatherResponse();
+		
+		try {
+			eyeweatherService.createLatlon("billy", 43.81, -92.23);
+			eyeweatherService.createLatlon("billy", 39.9, -75.2);
+		} catch (URISyntaxException | IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		List<Latlon> latlons = null;
 		String status = "OK";
 		try {
-			latlons = eyeweatherService.getLatlons(user);
+			latlons = eyeweatherService.getLatlons(userid);
 		} catch(Exception e) {
 			status = "ERROR due to " + e.getClass().getName();
 		}
@@ -34,6 +44,8 @@ public class EyeweatherController {
 		hits.setLatlons(latlons);
 		hits.setStatus(status);
 		hits.setTimestamp(new Date());
+		eyeweatherService.deleteLatlon(userid, "1");
+		eyeweatherService.deleteLatlon(userid, "2");
 		return hits;
 	}
 }

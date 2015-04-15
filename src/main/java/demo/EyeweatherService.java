@@ -28,7 +28,7 @@ public class EyeweatherService {
 	public static final String GOOGLE_HOST = "maps.googleapis.com/maps/api/geocode/json";
 	public static final String WEATHER_HOST = "forecast.weather.gov/MapClick.php";
 	
-	public void createLatlon(String userId, Integer latitude, Integer longitude) throws URISyntaxException, ClientProtocolException, IOException {
+	public void createLatlon(String userId, Double latitude, Double longitude) throws URISyntaxException, ClientProtocolException, IOException {
 		
 		URI googleUri = new URIBuilder()
 		.setScheme("http")
@@ -96,5 +96,9 @@ public class EyeweatherService {
 	
 	public List<Latlon> getLatlons (String userId) {
 		return eyeweatherRepository.getLatlons(userId);
+	}
+
+	public void deleteLatlon(String userId, String latlonId) {
+		eyeweatherRepository.delete(userId, latlonId);
 	}
 }
