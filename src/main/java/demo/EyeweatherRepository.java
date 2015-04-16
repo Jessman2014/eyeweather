@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class EyeweatherRepository {
-	List<Latlon> latlons;
+	List<Latlon> latlons = new ArrayList<>();
 	
 	public void addLatlon(Latlon newLatlon) {
 		latlons.add(newLatlon);
@@ -22,11 +22,13 @@ public class EyeweatherRepository {
 		return returnLatlons;
 	}
 
-	public void delete(String userId, String latlonId) {
+	public boolean delete(String userId, String latlonId) {
 		for (Latlon latlon : latlons) {
-			if(latlon.getUserId().equals(userId) && latlon.getId().equals(latlonId))
-				latlons.remove(latlon);
+			if(latlon.getUserId().equals(userId) && latlon.getId().equals(latlonId)) {
+				return latlons.remove(latlon);
+			}
 		}
+		return false;
 	}
 	
 }

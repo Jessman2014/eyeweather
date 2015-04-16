@@ -1,10 +1,13 @@
 package demo;
 
+import java.util.Date;
+
 public class Latlon {
 	private String id;
 	private String userId;
-	private double latitude;
-	private double longitude;
+	private String latitude;
+	private String longitude;
+	private Date datetime;
 	private String address;
 	private int winds;
 	private int temp;
@@ -24,17 +27,23 @@ public class Latlon {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	public double getLatitude() {
+	public String getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(double latitude) {
+	public void setLatitude(String latitude) {
 		this.latitude = latitude;
 	}
-	public double getLongitude() {
+	public String getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(double longitude) {
+	public void setLongitude(String longitude) {
 		this.longitude = longitude;
+	}
+	public Date getDatetime() {
+		return datetime;
+	}
+	public void setDatetime(Date datetime) {
+		this.datetime = datetime;
 	}
 	public String getAddress() {
 		return address;

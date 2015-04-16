@@ -7,16 +7,17 @@
 	<title>Eye Weather</title>
 	<script src="https://code.jquery.com/jquery-2.1.3.js"></script>
 	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/eyeweather/" rel="stylesheet">
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+	<script src="/eyeweather.js"></script>
 </head>
 <body>
 	<div class="container">
 		<div class="row">
 			<h1>Eye Weather</h1>
+			<h2 class="user">Billy</h2>
 		</div>
 		<div class="row">
-			<form class="form-inline">
+			<form class="form-inline" action="/latlon/users/Billy/location" method="post">
 				<div class="form-group">
 					<input type="number" class="form-control" id="lat" name="lat" placeholder="lat">
 				</div>

@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -25,77 +27,19 @@ public class EyeweatherService {
 	@Autowired
 	private EyeweatherRepository eyeweatherRepository;
 	
-	public static final String GOOGLE_HOST = "maps.googleapis.com/maps/api/geocode/json";
+	public static final String ADDRESS_HOST = "maps.googleapis.com/maps/api/geocode/json";
 	public static final String WEATHER_HOST = "forecast.weather.gov/MapClick.php";
 	
-	public void createLatlon(String userId, Double latitude, Double longitude) throws URISyntaxException, ClientProtocolException, IOException {
+	public void createLatlon(String userId, String latitude, String longitude) throws URISyntaxException, ClientProtocolException, IOException {
 		Latlon newLatlon = new Latlon();
 		newLatlon.setUserId(userId);
-		newLatlon.setId(latitude.toString());
+		newLatlon.setId(UUID.randomUUID().toString());
 		newLatlon.setLatitude(latitude);
 		newLatlon.setLongitude(longitude);
+		newLatlon.setDatetime(new Date());
 		
-		URI googleUri = new URIBuilder()
-		.setScheme("http")
-		.setHost(GOOGLE_HOST)
-		.setParameter("latlng", latitude.toString() + "," + longitude.toString())
-		.setParameter("sensor", "false")
-		.build();
-		
-		URI weatherUri = new URIBuilder()
-		.setScheme("http")
-		.setHost(WEATHER_HOST)
-		.setParameter("lat", latitude.toString())
-		.setParameter("lon", longitude.toString())
-		.setParameter("FcstType", "json")
-		.build();
-		
-		HttpGet httpget1 = new HttpGet(googleUri);		
-		CloseableHttpClient httpclient1 = HttpClients.createDefault();
-		RequestConfig requestConfig1 = RequestConfig.custom()
-		        .setSocketTimeout(1000)
-		        .setConnectTimeout(1000)
-		        .build();
-		
-		httpget1.setConfig(requestConfig1);		
-		CloseableHttpResponse response1 = httpclient1.execute(httpget1);		
-		
-		HttpEntity result1 = response1.getEntity();
-		InputStream stream1 = result1.getContent();			
-		ObjectMapper mapper1 = new ObjectMapper();
-		JsonNode root1 = mapper1.readTree(stream1);
-		JsonNode results = root1.get("results");
-		JsonNode frmt = results.get(0);
-		JsonNode frmtAddr = frmt.get("formatted_address");
-		String formattedAddress = frmtAddr.asText();
-		newLatlon.setAddress(formattedAddress);
-		stream1.close();
-		httpclient1.close();
-		
-		HttpGet httpget2 = new HttpGet(weatherUri);		
-		CloseableHttpClient httpclient2 = HttpClients.createDefault();
-		RequestConfig requestConfig2 = RequestConfig.custom()
-		        .setSocketTimeout(1000)
-		        .setConnectTimeout(1000)
-		        .build();
-		
-		httpget2.setConfig(requestConfig2);		
-		CloseableHttpResponse response2 = httpclient2.execute(httpget2);		
-		
-		HttpEntity result2 = response2.getEntity();
-		InputStream stream2 = result2.getContent();			
-		ObjectMapper mapper2 = new ObjectMapper();
-		JsonNode root2 = mapper2.readTree(stream2);
-		root2 = mapper2.readTree(stream2);
-		JsonNode data = root2.get("data");
-		JsonNode curObs = root2.get("currentobservation");
-		newLatlon.setForecast(data.get("text").get(0).asText());
-		newLatlon.setRelh(curObs.get("Relh").asInt());
-		newLatlon.setTemp(curObs.get("Temp").asInt());
-		newLatlon.setWinds(curObs.get("Winds").asInt());
-		newLatlon.setWeather(curObs.get("Weather").asText());
-		stream2.close();
-		httpclient2.close();
+		readWeather(newLatlon);
+		readAddress(newLatlon);
 		
 		/*Collections.sort(repos, new Comparator<Repo>() {
 			@Override
@@ -108,11 +52,76 @@ public class EyeweatherService {
 		eyeweatherRepository.addLatlon(newLatlon);
 	}
 	
+	private void readWeather (Latlon latlon) throws URISyntaxException, ClientProtocolException, IOException {
+		URI uri = new URIBuilder()
+		.setScheme("http")
+		.setHost(WEATHER_HOST)
+		.setParameter("lat", latlon.getLatitude())
+		.setParameter("lon", latlon.getLongitude())
+		.setParameter("FcstType", "json")
+		.build();
+		
+		HttpGet httpget = new HttpGet(uri);		
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		RequestConfig requestConfig = RequestConfig.custom()
+		        .setSocketTimeout(5000)
+		        .setConnectTimeout(5000)
+		        .build();
+		
+		httpget.setConfig(requestConfig);		
+		CloseableHttpResponse response = httpclient.execute(httpget);		
+		
+		HttpEntity result = response.getEntity();
+		InputStream stream = result.getContent();			
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root = mapper.readTree(stream);
+		JsonNode data = root.get("data");
+		JsonNode curObs = root.get("currentobservation");
+		latlon.setForecast(data.get("text").get(0).asText());
+		latlon.setRelh(curObs.get("Relh").asInt());
+		latlon.setTemp(curObs.get("Temp").asInt());
+		latlon.setWinds(curObs.get("Winds").asInt());
+		latlon.setWeather(curObs.get("Weather").asText());
+		stream.close();
+		httpclient.close();
+	}
+	
+	private void readAddress (Latlon latlon) throws URISyntaxException, ClientProtocolException, IOException {
+		URI uri = new URIBuilder()
+		.setScheme("http")
+		.setHost(ADDRESS_HOST)
+		.setParameter("latlng", latlon.getLatitude() + "," + latlon.getLongitude())
+		.setParameter("sensor", "false")
+		.build();
+		
+		HttpGet httpget = new HttpGet(uri);		
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		RequestConfig requestConfig = RequestConfig.custom()
+		        .setSocketTimeout(5000)
+		        .setConnectTimeout(5000)
+		        .build();
+		
+		httpget.setConfig(requestConfig);		
+		CloseableHttpResponse response = httpclient.execute(httpget);		
+		
+		HttpEntity result = response.getEntity();
+		InputStream stream = result.getContent();			
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root = mapper.readTree(stream);
+		JsonNode results = root.get("results");
+		JsonNode frmt = results.get(0);
+		JsonNode frmtAddr = frmt.get("formatted_address");
+		String formattedAddress = frmtAddr.asText();
+		latlon.setAddress(formattedAddress);
+		stream.close();
+		httpclient.close();
+	}
+	
 	public List<Latlon> getLatlons (String userId) {
 		return eyeweatherRepository.getLatlons(userId);
 	}
 
-	public void deleteLatlon(String userId, String latlonId) {
-		eyeweatherRepository.delete(userId, latlonId);
+	public boolean deleteLatlon(String userId, String latlonId) {
+		return eyeweatherRepository.delete(userId, latlonId);
 	}
 }
