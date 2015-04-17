@@ -1,9 +1,10 @@
 package demo;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
+
+import latlon.EyeweatherService;
+import latlon.Latlon;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value="/latlon")
 public class EyeweatherController {
 	
 	@Autowired
@@ -25,13 +25,6 @@ public class EyeweatherController {
 	@ResponseBody
 	public EyeweatherResponse get(@PathVariable String userid) {
 		EyeweatherResponse hits = new EyeweatherResponse();
-		
-		try {
-			eyeweatherService.createLatlon("Billy", "43.81", "-91.23");
-			eyeweatherService.createLatlon("Billy", "39.9", "-75.2");
-		} catch (URISyntaxException | IOException e1) {
-			e1.printStackTrace();
-		}
 		
 		List<Latlon> latlons = null;
 		String status = "OK";
@@ -44,18 +37,16 @@ public class EyeweatherController {
 		hits.setLatlons(latlons);
 		hits.setStatus(status);
 		hits.setTimestamp(new Date());
-		eyeweatherService.deleteLatlon(userid, "43.81");
-		eyeweatherService.deleteLatlon(userid, "39.9");
 		return hits;
 	}
 	
 	@RequestMapping(value="/users/{userid}/locations", method=RequestMethod.POST) 
 	public void create(@PathVariable String userid, @RequestBody String lat, @RequestBody String lon) {
-		try {
-			eyeweatherService.createLatlon(userid, lat, lon);
-		} catch (URISyntaxException | IOException e1) {
-			e1.printStackTrace();
-		}
+		String[] latLonArray = lat.split("&");
+		lat = latLonArray[0].split("=")[1];
+		lon = latLonArray[1].split("=")[1];
+		
+		eyeweatherService.createLatlon(userid, lat, lon);
 	}
 	
 	@RequestMapping(value="/users/{userid}/locations/{lid}", method=RequestMethod.DELETE)

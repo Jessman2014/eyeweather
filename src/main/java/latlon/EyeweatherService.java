@@ -1,15 +1,12 @@
-package demo;
+package latlon;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,7 +27,7 @@ public class EyeweatherService {
 	public static final String ADDRESS_HOST = "maps.googleapis.com/maps/api/geocode/json";
 	public static final String WEATHER_HOST = "forecast.weather.gov/MapClick.php";
 	
-	public void createLatlon(String userId, String latitude, String longitude) throws URISyntaxException, ClientProtocolException, IOException {
+	public void createLatlon(String userId, String latitude, String longitude) {
 		Latlon newLatlon = new Latlon();
 		newLatlon.setUserId(userId);
 		newLatlon.setId(UUID.randomUUID().toString());
@@ -41,18 +38,11 @@ public class EyeweatherService {
 		readWeather(newLatlon);
 		readAddress(newLatlon);
 		
-		/*Collections.sort(repos, new Comparator<Repo>() {
-			@Override
-			public int compare(Repo r1, Repo r2) {
-				return r2.getWatchersCount() - r1.getWatchersCount();
-			}
-			
-		});*/
-		
 		eyeweatherRepository.addLatlon(newLatlon);
 	}
 	
-	private void readWeather (Latlon latlon) throws URISyntaxException, ClientProtocolException, IOException {
+	private void readWeather (Latlon latlon) {
+		try {
 		URI uri = new URIBuilder()
 		.setScheme("http")
 		.setHost(WEATHER_HOST)
@@ -74,47 +64,55 @@ public class EyeweatherService {
 		HttpEntity result = response.getEntity();
 		InputStream stream = result.getContent();			
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode root = mapper.readTree(stream);
-		JsonNode data = root.get("data");
-		JsonNode curObs = root.get("currentobservation");
-		latlon.setForecast(data.get("text").get(0).asText());
-		latlon.setRelh(curObs.get("Relh").asInt());
-		latlon.setTemp(curObs.get("Temp").asInt());
-		latlon.setWinds(curObs.get("Winds").asInt());
-		latlon.setWeather(curObs.get("Weather").asText());
-		stream.close();
-		httpclient.close();
+		
+			JsonNode root = mapper.readTree(stream);
+			JsonNode data = root.get("data");
+			JsonNode curObs = root.get("currentobservation");
+			latlon.setForecast(data.get("text").get(0).asText());
+			latlon.setRelh(curObs.get("Relh").asInt());
+			latlon.setTemp(curObs.get("Temp").asInt());
+			latlon.setWinds(curObs.get("Winds").asInt());
+			latlon.setWeather(curObs.get("Weather").asText());
+			stream.close();
+			httpclient.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+		} 
 	}
 	
-	private void readAddress (Latlon latlon) throws URISyntaxException, ClientProtocolException, IOException {
-		URI uri = new URIBuilder()
-		.setScheme("http")
-		.setHost(ADDRESS_HOST)
-		.setParameter("latlng", latlon.getLatitude() + "," + latlon.getLongitude())
-		.setParameter("sensor", "false")
-		.build();
-		
-		HttpGet httpget = new HttpGet(uri);		
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-		RequestConfig requestConfig = RequestConfig.custom()
-		        .setSocketTimeout(5000)
-		        .setConnectTimeout(5000)
-		        .build();
-		
-		httpget.setConfig(requestConfig);		
-		CloseableHttpResponse response = httpclient.execute(httpget);		
-		
-		HttpEntity result = response.getEntity();
-		InputStream stream = result.getContent();			
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode root = mapper.readTree(stream);
-		JsonNode results = root.get("results");
-		JsonNode frmt = results.get(0);
-		JsonNode frmtAddr = frmt.get("formatted_address");
-		String formattedAddress = frmtAddr.asText();
-		latlon.setAddress(formattedAddress);
-		stream.close();
-		httpclient.close();
+	private void readAddress (Latlon latlon) {
+		try {
+			URI uri = new URIBuilder()
+			.setScheme("http")
+			.setHost(ADDRESS_HOST)
+			.setParameter("latlng", latlon.getLatitude() + "," + latlon.getLongitude())
+			.setParameter("sensor", "false")
+			.build();
+			
+			HttpGet httpget = new HttpGet(uri);		
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			RequestConfig requestConfig = RequestConfig.custom()
+			        .setSocketTimeout(5000)
+			        .setConnectTimeout(5000)
+			        .build();
+			
+			httpget.setConfig(requestConfig);		
+			CloseableHttpResponse response = httpclient.execute(httpget);		
+			
+			HttpEntity result = response.getEntity();
+			InputStream stream = result.getContent();			
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode root = mapper.readTree(stream);
+			JsonNode results = root.get("results");
+			JsonNode frmt = results.get(0);
+			JsonNode frmtAddr = frmt.get("formatted_address");
+			String formattedAddress = frmtAddr.asText();
+			latlon.setAddress(formattedAddress);
+			stream.close();
+			httpclient.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+		} 
 	}
 	
 	public List<Latlon> getLatlons (String userId) {

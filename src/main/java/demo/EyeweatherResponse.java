@@ -3,6 +3,8 @@ package demo;
 import java.util.Date;
 import java.util.List;
 
+import latlon.Latlon;
+
 public class EyeweatherResponse {
 	private Date timestamp;
 	private String status;

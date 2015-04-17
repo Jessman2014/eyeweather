@@ -1,0 +1,28 @@
+@CHARSET "ISO-8859-1";
+
+.head {
+	border-radius: 15px 15px 0px 0px;
+	background: #078FC0;
+	padding: 20px;
+	color: black;
+	margin-bottom: 0px;
+	margin-top: 20px;
+}
+
+.body {
+	border-radius: 0px 0px 15px 15px;
+	border: 2px solid #078FC0;
+	padding: 20px;
+}
+
+.glyphicon {
+	float: right;
+}
+
+span:first-child {
+	float: left;
+}
+
+.lid {
+	visibility: hidden;
+}
