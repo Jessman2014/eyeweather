@@ -40,18 +40,48 @@ public class EyeweatherController {
 		return hits;
 	}
 	
-	@RequestMapping(value="/users/{userid}/locations", method=RequestMethod.POST) 
-	public void create(@PathVariable String userid, @RequestBody String lat, @RequestBody String lon) {
+	@RequestMapping(value="/users/{userid}/locations", produces = MediaType.APPLICATION_JSON_VALUE, method=RequestMethod.POST) 
+	public EyeweatherResponse create(@PathVariable String userid, @RequestBody String lat, @RequestBody String lon) {
 		String[] latLonArray = lat.split("&");
 		lat = latLonArray[0].split("=")[1];
 		lon = latLonArray[1].split("=")[1];
 		
 		eyeweatherService.createLatlon(userid, lat, lon);
+		
+EyeweatherResponse hits = new EyeweatherResponse();
+		
+		List<Latlon> latlons = null;
+		String status = "OK";
+		try {
+			latlons = eyeweatherService.getLatlons(userid);
+		} catch(Exception e) {
+			status = "ERROR due to " + e.getClass().getName();
+		}
+		
+		hits.setLatlons(latlons);
+		hits.setStatus(status);
+		hits.setTimestamp(new Date());
+		return hits;
 	}
 	
-	@RequestMapping(value="/users/{userid}/locations/{lid}", method=RequestMethod.DELETE)
-	public void delete(@PathVariable String userid, @PathVariable String lid) {
+	@RequestMapping(value="/users/{userid}/locations/{lid}", produces = MediaType.APPLICATION_JSON_VALUE, method=RequestMethod.DELETE)
+	public EyeweatherResponse delete(@PathVariable String userid, @PathVariable String lid) {
 		eyeweatherService.deleteLatlon(userid, lid);
+		
+EyeweatherResponse hits = new EyeweatherResponse();
+		
+		List<Latlon> latlons = null;
+		String status = "OK";
+		try {
+			latlons = eyeweatherService.getLatlons(userid);
+		} catch(Exception e) {
+			status = "ERROR due to " + e.getClass().getName();
+		}
+		
+		hits.setLatlons(latlons);
+		hits.setStatus(status);
+		hits.setTimestamp(new Date());
+		return hits;
 	}
 	
 }

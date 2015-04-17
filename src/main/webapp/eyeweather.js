@@ -45,8 +45,10 @@ $( function () {
 						$('.hit').remove();
 						$.each(latlons, function(i,val) {
 							$('div.container').append('<div class="row hit"><p class="head"><span>' + val.address + 
-									'</span><span class="lid">' + val.id + '</span><span  id="glyph'+ i + '" class="glyphicon glyphicon-trash" aria-hidden="true"></span></p><p class="body">Coordinates:(' + val.latitude + ', ' + val.longitude + 
-									')<br>Time: ' + val.time + '<br>Wind: ' + val.winds + ', Temperature: ' +
+									'</span><span class="lid">' + val.id + '</span><span  id="glyph'+ i 
+									+ '" class="glyphicon glyphicon-trash" aria-hidden="true"></span></p><p class="body">Coordinates:(' 
+									+ val.latitude + ', ' + val.longitude + 
+									')<br>Time: ' + val.dateString + '<br>Wind: ' + val.winds + ', Temperature: ' +
 									val.temp + ', Humdidity: ' + val.relh + '<br>Current: ' + val.weather + 
 									'<br>Forecast: ' + val.forecast + '</p>');
 							
@@ -76,8 +78,28 @@ $( function () {
 				url: "/latlon/users/" + userName + "/locations/" + lid,
 				method: "DELETE",
 				dataType: "json",
-				success: function() {
-					getAll();
+				success: function(results) {
+					if (results.status === "OK"){
+						var latlons = results.latlons;
+						$('.hit').remove();
+						$.each(latlons, function(i,val) {
+							$('div.container').append('<div class="row hit"><p class="head"><span>' + val.address + 
+									'</span><span class="lid">' + val.id + '</span><span  id="glyph'+ i + '" class="glyphicon glyphicon-trash" aria-hidden="true"></span></p><p class="body">Coordinates:(' + val.latitude + ', ' + val.longitude + 
+									')<br>Time: ' + val.time + '<br>Wind: ' + val.winds + ', Temperature: ' +
+									val.temp + ', Humdidity: ' + val.relh + '<br>Current: ' + val.weather + 
+									'<br>Forecast: ' + val.forecast + '</p>');
+							
+						});
+						var glyphs = $('.glyphicon');
+						for (i=0; i<glyphs.length; i += 1) {
+							var glyphId = '#glyph' + i;
+							var id = $(glyphId).prev().text()
+							$(glyphId).click( function(){
+								deleteLatlon(id);
+							});
+						}
+						
+					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					  console.log(textStatus, errorThrown);
@@ -97,8 +119,28 @@ $( function () {
 				method: "POST",
 				dataType: "json",
 				data: {"lat": latitude, "lon": longitude},
-				success: function() {
-					getAll();
+				success: function(results) {
+					if (results.status === "OK"){
+						var latlons = results.latlons;
+						$('.hit').remove();
+						$.each(latlons, function(i,val) {
+							$('div.container').append('<div class="row hit"><p class="head"><span>' + val.address + 
+									'</span><span class="lid">' + val.id + '</span><span  id="glyph'+ i + '" class="glyphicon glyphicon-trash" aria-hidden="true"></span></p><p class="body">Coordinates:(' + val.latitude + ', ' + val.longitude + 
+									')<br>Time: ' + val.time + '<br>Wind: ' + val.winds + ', Temperature: ' +
+									val.temp + ', Humdidity: ' + val.relh + '<br>Current: ' + val.weather + 
+									'<br>Forecast: ' + val.forecast + '</p>');
+							
+						});
+						var glyphs = $('.glyphicon');
+						for (i=0; i<glyphs.length; i += 1) {
+							var glyphId = '#glyph' + i;
+							var id = $(glyphId).prev().text()
+							$(glyphId).click( function(){
+								deleteLatlon(id);
+							});
+						}
+						
+					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					  console.log(textStatus, errorThrown);

@@ -4,10 +4,11 @@ import java.util.Date;
 
 public class Latlon {
 	private String id;
-	private String userId;
+	private String userName;
 	private String latitude;
 	private String longitude;
 	private Date datetime;
+	private String dateString;
 	private String address;
 	private int winds;
 	private int temp;
@@ -21,11 +22,11 @@ public class Latlon {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getUserId() {
-		return userId;
+	public String getUserName() {
+		return userName;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserId(String userName) {
+		this.userName = userName;
 	}
 	public String getLatitude() {
 		return latitude;
@@ -44,6 +45,12 @@ public class Latlon {
 	}
 	public void setDatetime(Date datetime) {
 		this.datetime = datetime;
+	}
+	public String getDateString() {
+		return dateString;
+	}
+	public void setDateString(String dateString) {
+		this.dateString = dateString;
 	}
 	public String getAddress() {
 		return address;

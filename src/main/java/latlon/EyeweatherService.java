@@ -2,6 +2,9 @@ package latlon;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -27,13 +30,14 @@ public class EyeweatherService {
 	public static final String ADDRESS_HOST = "maps.googleapis.com/maps/api/geocode/json";
 	public static final String WEATHER_HOST = "forecast.weather.gov/MapClick.php";
 	
-	public void createLatlon(String userId, String latitude, String longitude) {
+	public void createLatlon(String userName, String latitude, String longitude) {
 		Latlon newLatlon = new Latlon();
-		newLatlon.setUserId(userId);
+		newLatlon.setUserId(userName);
 		newLatlon.setId(UUID.randomUUID().toString());
 		newLatlon.setLatitude(latitude);
 		newLatlon.setLongitude(longitude);
 		newLatlon.setDatetime(new Date());
+		newLatlon.setDateString(new Date().toString());
 		
 		readWeather(newLatlon);
 		readAddress(newLatlon);
@@ -76,7 +80,6 @@ public class EyeweatherService {
 			stream.close();
 			httpclient.close();
 		} catch (Exception e) {
-			//e.printStackTrace();
 		} 
 	}
 	
@@ -111,12 +114,25 @@ public class EyeweatherService {
 			stream.close();
 			httpclient.close();
 		} catch (Exception e) {
-			//e.printStackTrace();
 		} 
 	}
 	
-	public List<Latlon> getLatlons (String userId) {
-		return eyeweatherRepository.getLatlons(userId);
+	public List<Latlon> getLatlons (String userName) {
+		List<Latlon> list = eyeweatherRepository.getLatlons(userName);
+		if (list != null){
+			Collections.sort(list, new Comparator<Latlon>() {
+				@Override
+				public int compare(Latlon r1, Latlon r2) {
+					return r2.getDatetime().compareTo(r1.getDatetime());
+				}
+			});
+			List<Latlon> retList = new ArrayList<>(); 
+			for(int i = 0; i < list.size() && i < 20; i++){
+				retList.add(list.get(i));
+			}
+			return retList;
+		}
+		return null;
 	}
 
 	public boolean deleteLatlon(String userId, String latlonId) {
